@@ -27,7 +27,6 @@ const Products = ({ products, categories, deleteProduct }) => {
           })
         }
       </ul>
-      <Link to='/'>Main menu</Link>
     </div>
   );
 }

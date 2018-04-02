@@ -1,6 +1,7 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import axios from 'axios';
+import loggerMiddleware from 'redux-logger';
 
 const SET_CATEGORIES = 'SET_CATEGORIES';
 const CREATE_CATEGORY = 'CREATE_CATEGORY';
@@ -8,6 +9,7 @@ const DELETE_CATEGORY = 'DELETE_CATEGORY';
 const SET_PRODUCTS = 'SET_PRODUCTS';
 const DELETE_PRODUCT = 'DELETE_PRODUCT';
 const CREATE_PRODUCT = 'CREATE_PRODUCT';
+const DELETE_PRODUCT_IN_CATEGORY = 'DELETE_PRODUCT_IN_CATEGORY';
 
 const productsReducer = (state = [], action) => {
   switch (action.type) {
@@ -17,8 +19,8 @@ const productsReducer = (state = [], action) => {
     case DELETE_PRODUCT:
       state = state.filter(product => product.id !== action.product.id);
       break;
-    case DELETE_CATEGORY:
-      state = state.filter(product => product.categorizedId != action.category.id);//how to know category id //after deleting category ID no null error?
+    case DELETE_PRODUCT_IN_CATEGORY:
+      state = state.filter(product => product.categorizedId * 1 != action.category.id * 1);//how to know category id //after deleting category ID no null error?
       break;
     case CREATE_PRODUCT:
       state = [...state, action.product];
@@ -65,10 +67,8 @@ const loadProducts = () => {
   };
 }
 
-const createCategory = () => {
+const createCategory = (category) => {
   return (dispatch) => {
-    const randomNumber = Math.floor(Math.random() * 1000);
-    const category = { name: `${randomNumber}-Category`, categories: [] };
     return axios.post('/api/categories', category)
       .then(result => result.data)
       .then(category => dispatch({
@@ -114,12 +114,25 @@ const deleteProduct = (product) => {
   };
 };
 
+const deleteProductsInCategory = (category, products) => {
+  return (dispatch) => {
+    products.filter(product => product.categorizedId === category.id).forEach(product => {
+      return axios.delete(`api/products/${product.id}`)
+        .then(() => dispatch({
+          type: DELETE_PRODUCT_IN_CATEGORY,
+          category
+        }))
+        .catch(err => console.error(err));
+    })
+  }
+}
+
 const reducer = combineReducers({
   products: productsReducer,
   categories: categoriesReducer
 })
 
-const store = createStore(reducer, applyMiddleware(thunk));
+const store = createStore(reducer, applyMiddleware(loggerMiddleware, thunk));
 
 export default store;
-export { loadCategories, createCategory, deleteCategory, loadProducts, deleteProduct, createProduct };
+export { loadCategories, createCategory, deleteCategory, loadProducts, deleteProduct, createProduct, deleteProductsInCategory };

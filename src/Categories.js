@@ -8,18 +8,20 @@ const Categories = ({ categories, createCategory, products }) => {
     <div>
       <ul>
         <li>
-          <button onClick={() => createCategory()}>Create a category</button>
+          <button onClick={createCategory}>Create a category</button>
         </li>
         <li>
           <Link to='/products'>All Products ({products.length})
           </Link>
         </li>
         {
-          categories.map(category => {
+          categories && categories.map(category => {
             return (
               <li key={category.id}>
                 <Link to={`/${category.id}`} >
-                  {`${category.name} (${category.categories ? category.categories.length : 0})`}
+                  {
+                    `${category.name} (${category.categories ? category.categories.length : 0})`
+                  }
                 </Link>
               </li>
             );
@@ -40,9 +42,13 @@ const mapStateToProps = ({ categories, products }) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     createCategory: () => {
-      return dispatch(createCategory());
-    }
+      return dispatch(createCategory({
+        name: `${Math.floor(Math.random()*1000)}-Category`,
+        categories: []
+      })
+    )}
   };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Categories);
+//${category.categories ? category.categories.length : 0}

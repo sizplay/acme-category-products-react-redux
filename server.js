@@ -5,9 +5,7 @@ const { Category, Products } = db.models;
 const path = require('path');
 
 app.use(require('body-parser').json());
-
 app.get('/', (req, res, next)=> res.sendFile(path.join(__dirname, 'index.html')));
-
 app.use('/dist', express.static(path.join(__dirname, 'dist')));
 
 app.get('/api/products', (req, res, next)=> {

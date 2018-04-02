@@ -17,11 +17,13 @@ class App extends Component {
     return (
       <div>
         <Router>
-          <div>
-            <Route exact path='/' render={() => <Categories />} />
-            <Route path='/:id' render={({ match, history }) => <Category id={match.params.id * 1} history = {history} />} />
-            <Route path='/products' render={() => <Products />} />
-          </div>
+          <Switch>
+            <div>
+              <Route exact component={Categories} />
+              <Route exact path='/:id' render={({ match, history }) => <Category id={match.params.id * 1} history={history} />} />
+              <Route exact path='/products' render={() => <Products />} />
+            </div>
+          </Switch>
         </Router>
       </div>
     );
